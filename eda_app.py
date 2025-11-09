@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 import io, contextlib
 from Automated_EDA import EDA
 
@@ -22,7 +24,6 @@ if uploaded_file:
         st.stop()
 
     st.success(f"✅ Successfully loaded {uploaded_file.name}")
-    st.dataframe(df.head())
 
     # --- Data Overview ---
     with st.expander("📊 Data Overview"):
@@ -82,6 +83,13 @@ if uploaded_file:
     # --- Cleaned Output ---
     st.write("### 🧾 Cleaned Data Sample")
     st.dataframe(df.head(20))
+
+    # --- Correlation Heatmap ---
+    st.write("### 📈 Correlation Heatmap")
+    corr_matrix = df.select_dtypes(include=np.number).corr()
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="coolwarm", square=True, ax=ax)
+    st.pyplot(fig)
 
     # --- Download ---
     csv = df.to_csv(index=False).encode('utf-8')

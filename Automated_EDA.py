@@ -105,3 +105,4 @@ class EDA:
                     writer(f"Filled missing values in categorical column '{col}' with mode: {fill_value}.")
 
         return df
+
