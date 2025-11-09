@@ -3,7 +3,7 @@ import numpy as np
 import re
 from datetime import datetime
 
-class EDA:
+class data_clean:
 
     @staticmethod
     def data_overview(df: pd.DataFrame, writer=print):
@@ -114,7 +114,16 @@ class EDA:
                 # Step 4: Reconfirm dtype (ensures no object conversion)
                 df[col] = pd.to_datetime(df[col], errors="coerce", dayfirst=True)
 
+                # Safety: ensure pandas stores as datetime64[ns]
+                if not pd.api.types.is_datetime64_any_dtype(df[col]):
+                    df[col] = pd.to_datetime(df[col], errors="coerce", dayfirst=True)
+
+                # Step 5: Log with safe Timestamp
+                if not isinstance(fill_value, pd.Timestamp):
+                    fill_value = pd.Timestamp(fill_value)
+
                 writer(f"Filled missing datetime values in '{col}' with {fill_value.strftime('%d-%m-%Y')}.")
+
 
             # --- Categorical or Object Columns ---
             elif pd.api.types.is_categorical_dtype(df[col]) or pd.api.types.is_object_dtype(df[col]):
