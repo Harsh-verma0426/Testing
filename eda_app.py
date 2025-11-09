@@ -26,11 +26,29 @@ if uploaded_file:
 
     # --- Data Overview ---
     with st.expander("📊 Data Overview"):
-        buffer = io.StringIO()
-        df.info(buf=buffer)
-        s = buffer.getvalue()
-        st.text(s)
-        st.dataframe(df.describe(include='all'))
+        st.subheader("Dataset Information")
+
+        # Create DataFrame similar to df.info() output
+        info_df = pd.DataFrame({
+            "Column": df.columns,
+            "Non-Null Count": [df[col].count() for col in df.columns],
+            "Dtype": [df[col].dtype for col in df.columns]
+        })
+
+        # Highlight missing values
+        def highlight_missing(val):
+            return 'background-color: #ffcccc' if val < len(df) else ''
+
+        styled_info = info_df.style.applymap(highlight_missing, subset=['Non-Null Count'])
+        st.dataframe(styled_info, use_container_width=True)
+
+        # Show basic stats
+        st.subheader("Statistical Summary")
+        st.dataframe(df.describe(include='all'), use_container_width=True)
+
+        # Optional: Show sample rows
+        st.subheader("Sample Rows")
+        st.dataframe(df.head(), use_container_width=True)
 
     # --- Remove Duplicates ---
     if st.button("Remove Duplicates"):
